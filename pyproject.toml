@@ -1,20 +1,25 @@
-[tool.poetry]
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
+[project]
 name = "shape_of_sort"
 version = "0.1.0"
 description = ""
-authors = ["Paul Albee <paula@allenai.org>"]
+authors = [{ name = "Paul Albee", email = "paula@allenai.org" }]
+requires-python = ">=3.14,<3.15"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "ipython>=9.17.1,<10",
+    "numpy>=2.5.2,<3",
+    "matplotlib>=3.11.1,<4",
+    "scikit-image>=0.26,<0.27",
+    "Pillow>=12.3,<13.0",
+    "tabulate>=0.10.0,<0.11",
+]
 
-[tool.poetry.dependencies]
-python = "~3.10"
-ipython = "^8.4.0"
-numpy = "^1.23.2"
-matplotlib = "^3.5.3"
-scikit-image = "^0.19.3"
-Pillow = "^9.2.0"
-tabulate = "^0.8.10"
-
-[tool.poetry.dev-dependencies]
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = []
