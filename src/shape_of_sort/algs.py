@@ -1,31 +1,14 @@
 import math
 from random import shuffle
 
-import PIL.Image
-import numpy as np
-import tabulate
-
-algorithms = {}
 
 
-def add_alg(func):
-    """Decorator that adds the decorated function to a dictionary of algorithms.
-    :param func: A function that takes a list of comparable values.
-    :return: The function that was passed in.
-    """
-    global algorithms
-    fname = func.__name__
-    algorithms[fname] = func
 
-    return func
-
-
-@add_alg
-def radix_sort_lsd(cells):
+def radix_sort_lsd(cells, base = 10, **kwargs):
     """Radix sort operates by grouping keys by their radix positions."""
     trace = [cells[:]]
     compares = []
-    base = 7
+    # base = 17
 
     def combine_buckets(buckets, cells=[]):
         """Concatenates the buckets, returning a concatenated list.
@@ -40,7 +23,8 @@ def radix_sort_lsd(cells):
         return concatenated
 
     def get_digit_at_radix_position(value, postion):
-        """Radix position 0 is the 1s position. While 1 is the 10s, and 2 is the 100s, and n is the 10**n
+        """Radix position 0 is the 1s position. While 1 is the 10s, and 2 is the
+        100s, and n is the 10**n
         """
         radix_position = base ** postion
         return (value // radix_position) % base
@@ -69,8 +53,7 @@ def radix_sort_lsd(cells):
     return trace, compares
 
 
-@add_alg
-def quicksort_hoare(cells):
+def quicksort_hoare(cells,**kwargs):
     """Implement Hoare's version of quicksort"""
     trace = [cells[:]]
     compares = []
@@ -113,8 +96,7 @@ def quicksort_hoare(cells):
     return trace, compares
 
 
-@add_alg
-def quicksort_lomuto(cells):
+def quicksort_lomuto(cells, **kwargs):
     """Implement Lomuto's version of quicksort"""
     trace = [cells[:]]
     compares = []
@@ -160,8 +142,7 @@ def prepare_data(n_cells, reverse=False, shuffled=True):
     return cells
 
 
-@add_alg
-def heapsort(cells):
+def heapsort(cells,**kwargs):
     trace = [cells[:]]
     compares = []
 
@@ -199,8 +180,7 @@ def heapsort(cells):
     return trace, compares
 
 
-@add_alg
-def merge(cells):
+def merge(cells,**kwargs):
     trace = [cells[:]]
     compares = []
     n = len(cells)
@@ -234,8 +214,7 @@ def merge(cells):
     return trace, compares
 
 
-@add_alg
-def bubble(cells):
+def bubble(cells, **kwargs):
     trace = [cells[:]]
     compares = []
     swap = True
@@ -254,8 +233,7 @@ def bubble(cells):
     return trace, compares
 
 
-@add_alg
-def insertion(cells):
+def insertion(cells, **kwargs):
     trace = [cells[:]]
     compares = []
     n = len(cells)
@@ -273,8 +251,7 @@ def insertion(cells):
     return trace, compares
 
 
-@add_alg
-def selection(cells):
+def selection(cells,**kwargs):
     trace = [cells[:]]
     compares = []
 
@@ -305,37 +282,3 @@ def render(history, destination):
             for j in range(n_cells):
                 destination.write(f'"node{i - 1}":f{j} ->  "node{i}":f{j};\n')
     destination.write("}\n")
-
-
-def main():
-    n_cells = 64
-    report = []
-    start_data = prepare_data(n_cells, shuffled=False, reverse=True)
-    for alg_name in algorithms.keys():
-        trace, compares = algorithms[alg_name](start_data[:])
-        # with open(f"{alg_name}.dot", 'w') as dest:
-        #     render(trace, dest)
-        memory = np.zeros((len(trace), n_cells, 3), dtype="uint8")
-
-        for row, cols in enumerate(trace):
-            cols = np.array(cols)
-            memory[row, :, 0] = cols / n_cells * 256
-            memory[row, :, 1] = cols / n_cells * 256
-            memory[row, :, 2] = cols / n_cells * 256
-        img = PIL.Image.fromarray(memory, mode="RGB")
-        img = img.convert("RGB")
-        img.save(f"{alg_name}_{n_cells}_memory.png")
-
-        checks = np.zeros((len(compares), n_cells), dtype=bool)
-        for row, cols in enumerate(compares):
-            checks[row, cols] = 1
-        img = PIL.Image.fromarray(checks)
-        img.save(f"{alg_name}_{n_cells}_compares.png")
-
-        report.append({'Algorit hm': alg_name, 'Compares': len(checks), 'Assignments': len(trace)})
-
-    print(tabulate.tabulate(report, headers='keys'))
-
-
-if "__main__" == __name__:
-    main()
