@@ -1,9 +1,5 @@
-[build-system]
-requires = ["uv_build>=0.9.18,<0.10.0"]
-build-backend = "uv_build"
-
 [project]
-name = "shape_of_sort"
+name = "shape-of-sort"
 version = "0.1.0"
 description = ""
 authors = [{ name = "Paul Albee", email = "paula@allenai.org" }]
@@ -20,6 +16,16 @@ dependencies = [
     "Pillow>=12.3,<13.0",
     "tabulate>=0.10.0,<0.11",
 ]
+# Source - https://stackoverflow.com/a/79481585
+# Posted by Gwang-Jin Kim, modified by community. See post 'Timeline' for change history
+# Retrieved 2026-09-05, License - CC BY-SA 4.0
+
+[tool.uv]
+package = true
 
 [dependency-groups]
 dev = []
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13"]
+build-backend = "uv_build"
