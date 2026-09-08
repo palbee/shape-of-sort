@@ -1,8 +1,51 @@
 import math
+from math import floor
 from random import shuffle
 
 
+def cycle_sort(cells, **kwargs) -> int:
+    """Sort an cells in place and return the number of writes."""
+    trace = [cells[:]]
+    compares = []
+    # Loop through the cells to find cycles to rotate.
+    # Note that the last item will already be sorted after the first n-1 cycles.
+    for cycle_start in range(0, len(cells) - 1):
+        item = cells[cycle_start]
 
+        # Find where to put the item.
+        pos = cycle_start
+        for i in range(cycle_start + 1, len(cells)):
+            if cells[i] < item:
+                compares.append([cycle_start, i])
+                pos += 1
+
+        # If the item is already there, this is not a cycle.
+        if pos == cycle_start:
+            continue
+
+        # Otherwise, put the item there or right after any duplicates.
+        while item == cells[pos]:
+            pos += 1
+
+        cells[pos], item = item, cells[pos]
+        trace.append(cells[:])
+
+        # Rotate the rest of the cycle.
+        while pos != cycle_start:
+            # Find where to put the item.
+            pos = cycle_start
+            for i in range(cycle_start + 1, len(cells)):
+                if cells[i] < item:
+                    pos += 1
+                    compares.append([cycle_start, i])
+
+            # Put the item there or right after any duplicates.
+            while item == cells[pos]:
+                pos += 1
+            cells[pos], item = item, cells[pos]
+            trace.append(cells[:])
+
+    return trace, compares
 
 def radix_sort_lsd(cells, base = 10, **kwargs):
     """Radix sort operates by grouping keys by their radix positions."""
@@ -10,12 +53,14 @@ def radix_sort_lsd(cells, base = 10, **kwargs):
     compares = []
     # base = 17
 
-    def combine_buckets(buckets, cells=[]):
+    def combine_buckets(buckets, cells=None):
         """Concatenates the buckets, returning a concatenated list.
         :type buckets: list of lists
         :returns: list
         """
 
+        if cells is None:
+            cells = []
         concatenated = []
         for bucket in buckets:
             concatenated.extend(bucket)
@@ -149,7 +194,7 @@ def heapsort(cells,**kwargs):
     def pushdown(data, start, end, trace):
         """
         Push the element in data @ start down into the maxheap
-        :param data: the array being heap fixed
+        :param data: the cells being heap fixed
         :param start: the node index we start at.
         """
         root = start
@@ -209,10 +254,34 @@ def merge(cells,**kwargs):
             combine(i, min(i + width, n), min(i + 2 * width, n))
             i += (2 * width)
         source, dest = dest, source
-        # trace.append(source[:])
+        trace.append(source[:])
         width *= 2
     return trace, compares
 
+def combsort(cells, **kwargs_):
+    trace = [cells[:]]
+    compares = []
+    gap=len(cells)
+    shrink = 1.3
+    all_sorted = False
+
+    while not all_sorted:
+        gap = floor(gap/shrink)
+        if gap <= 1:
+            gap =1
+            all_sorted = True
+        elif gap == 9 or gap == 10:
+            gap = 11
+
+        i = 0
+        while (i+gap) < len(cells):
+            compares.append([i+gap, i])
+            if cells[i] > cells[i+gap]:
+                cells[i], cells[i+gap] = cells[i+gap], cells[i]
+                trace.append(cells[:])
+                all_sorted = False
+            i += 1
+    return trace, compares
 
 def bubble(cells, **kwargs):
     trace = [cells[:]]
@@ -227,6 +296,13 @@ def bubble(cells, **kwargs):
                 cells[i - 1], cells[i] = cells[i], cells[i - 1]
                 swap = True
                 trace.append(cells[:])
+        for i in range(n-1, 0,-1):
+            compares.append([i - 1, i])
+            if cells[i - 1] > cells[i]:
+                cells[i - 1], cells[i] = cells[i], cells[i - 1]
+                swap = True
+                trace.append(cells[:])
+
         n -= 1
         # if swap:
         #     trace.append(cells[:])
